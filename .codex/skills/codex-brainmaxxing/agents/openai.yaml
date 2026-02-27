@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Brainmaxxing"
+  short_description: "Persistent memory workflow for Codex sessions"
+  default_prompt: "Reflect and evolve project memory in brain/"

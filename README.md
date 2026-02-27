@@ -42,6 +42,25 @@ It needs to:
 3. Copy `.claude/hooks/` and merge hook config into `.claude/settings.json`
 4. Append the brain instructions from `CLAUDE.md` into the project's `CLAUDE.md`
 
+## Codex-Native Add-on
+
+This fork adds a Codex-native skill at:
+
+`/.codex/skills/codex-brainmaxxing`
+
+It ports the same `brain` / `reflect` / `meditate` / `ruminate` loop for Codex and includes:
+
+1. `scripts/extract-codex-conversations.py` for mining `~/.codex/sessions/**/*.jsonl`
+2. `scripts/inject-brain.sh` and `scripts/auto-index-brain.sh` to emulate startup and post-edit memory hooks
+3. `references/agents.md` with Codex sub-agent prompt/report templates
+
+Quick run:
+
+```bash
+bash .codex/skills/codex-brainmaxxing/scripts/inject-brain.sh "$PWD"
+python3 .codex/skills/codex-brainmaxxing/scripts/extract-codex-conversations.py "$HOME/.codex/sessions" /tmp/codex-ruminate --workspace "$PWD" --batches 5
+```
+
 ## License
 
 MIT
