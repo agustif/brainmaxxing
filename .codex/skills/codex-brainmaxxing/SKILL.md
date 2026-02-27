@@ -1,6 +1,6 @@
 ---
 name: codex-brainmaxxing
-description: Persistent memory workflow for Codex using a markdown brain vault in `brain/`. Use when you need to preserve durable project knowledge, run end-of-session reflection, audit stale or redundant memory notes, mine past Codex sessions for recurring patterns, or emulate Claude-style memory hooks in Codex.
+description: Persistent memory workflow for Codex using a markdown brain vault in `brain/`. Use when you need to preserve durable project knowledge, run end-of-session reflection, audit stale or redundant memory notes, mine past Codex sessions for recurring patterns, or wire Codex native notification hooks into memory maintenance.
 ---
 
 # Codex Brainmaxxing
@@ -16,21 +16,30 @@ Use four operations: `brain`, `reflect`, `meditate`, and `ruminate`.
 3. Periodically run `meditate` to prune stale notes and tighten principles.
 4. Occasionally run `ruminate` to mine historical Codex sessions.
 
-## Hook Emulation In Codex
+## Native Codex Hooks
 
-Codex has no first-class `SessionStart`/`PostToolUse` hook API like Claude.
+Codex supports native end-of-turn notification hooks via `notify` in `~/.codex/config.toml`.
 
-Emulate the same behavior with scripts:
+Use this to keep brain indexes fresh after each turn:
 
-```bash
-# Session-start equivalent
-bash .codex/skills/codex-brainmaxxing/scripts/inject-brain.sh "$PWD"
-
-# Post-brain-edit equivalent
-bash .codex/skills/codex-brainmaxxing/scripts/auto-index-brain.sh "$PWD"
+```toml
+notify = ["bash", "/absolute/path/to/project/.codex/skills/codex-brainmaxxing/scripts/codex-notify-hook.sh", "/absolute/path/to/project"]
 ```
 
-Use these scripts in shell wrappers, CI steps, or your personal session bootstrap.
+The notify payload is appended as the final argument (type: `agent-turn-complete`).
+
+Codex does not expose a user-configurable session-start hook in config yet, so keep startup bootstrap via:
+
+```bash
+# Session-start bootstrap
+bash .codex/skills/codex-brainmaxxing/scripts/inject-brain.sh "$PWD"
+```
+
+When you need deterministic immediate updates after manual brain edits, run:
+
+```bash
+bash .codex/skills/codex-brainmaxxing/scripts/auto-index-brain.sh "$PWD"
+```
 
 ## Operation: brain
 
@@ -198,6 +207,7 @@ rm -rf /tmp/codex-ruminate
 ## Resources
 
 - `scripts/snapshot.sh`: Concatenate markdown trees into a snapshot file.
+- `scripts/codex-notify-hook.sh`: Native Codex `notify` hook adapter for auto-indexing.
 - `scripts/inject-brain.sh`: Session-start brain index injection.
 - `scripts/auto-index-brain.sh`: Rebuild `brain/index.md` on drift.
 - `scripts/extract-codex-conversations.py`: Parse Codex session JSONL into analyzable batches.
