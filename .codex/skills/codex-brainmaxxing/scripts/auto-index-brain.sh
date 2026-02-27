@@ -39,12 +39,15 @@ dirs="$(printf '%s\n' "$disk" | grep '/' | sed 's|/.*||' | sort -u || true)"
     files="$(printf '%s\n' "$disk" | grep "^$section\(/\|$\)" || true)"
     [ -z "$files" ] && continue
 
-    header="$(printf '%s' "$section" | sed 's/./\U&/')"
+    header="$(printf '%s' "$section" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')"
     printf '\n## %s\n' "$header"
     printf '%s\n' "$files" | emit_links
   done
 
   standalone="$(printf '%s\n' "$disk" | grep -v '/' || true)"
+  for section in $dirs; do
+    standalone="$(printf '%s\n' "$standalone" | grep -v "^$section$" || true)"
+  done
   if [ -n "$standalone" ]; then
     printf '\n## Other\n'
     printf '%s\n' "$standalone" | emit_links
